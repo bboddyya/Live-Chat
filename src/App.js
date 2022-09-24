@@ -1,23 +1,30 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState } from "react";
+import { BrowserRouter } from "react-router-dom";
+import AppRouter from "./components/AppRouter";
+import Navbar from "./components/Navbar";
+import { Context } from "./context/contextAuth";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 function App() {
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const auth = getAuth();
+
+  onAuthStateChanged(auth, (user) => {
+    setUserData(user);
+  });
+
+  console.log(userData);
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Context.Provider
+        value={{ userData, setUserData, auth, setLoading, loading }}
+      >
+        <BrowserRouter>
+          <Navbar />
+          <AppRouter userData={userData} setUserData={setUserData} />
+        </BrowserRouter>
+      </Context.Provider>
     </div>
   );
 }
